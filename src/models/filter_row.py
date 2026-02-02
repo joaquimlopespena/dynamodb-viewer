@@ -46,9 +46,9 @@ class FilterRow:
             variable=self.attr_var,
             values=self.attributes if self.attributes else [""],
             width=180,
-            height=32
+            height=26
         )
-        self.attr_combo.grid(row=0, column=0, padx=5, pady=5)
+        self.attr_combo.grid(row=0, column=0, padx=4, pady=3)
         self.attr_combo.set("")
 
         # Condição
@@ -58,11 +58,11 @@ class FilterRow:
             variable=self.condition_var,
             values=self.CONDITIONS,
             width=160,
-            height=32,
+            height=26,
             state="readonly",
             command=self.on_condition_change
         )
-        self.condition_combo.grid(row=0, column=1, padx=5, pady=5)
+        self.condition_combo.grid(row=0, column=1, padx=4, pady=3)
 
         # Tipo
         self.type_var = ctk.StringVar(value="String")
@@ -71,10 +71,10 @@ class FilterRow:
             variable=self.type_var,
             values=self.TYPES,
             width=100,
-            height=32,
+            height=26,
             state="readonly"
         )
-        self.type_combo.grid(row=0, column=2, padx=5, pady=5)
+        self.type_combo.grid(row=0, column=2, padx=4, pady=3)
 
         # Valor
         self.value_var = ctk.StringVar()
@@ -82,21 +82,21 @@ class FilterRow:
             self.frame,
             textvariable=self.value_var,
             width=200,
-            height=32
+            height=26
         )
-        self.value_entry.grid(row=0, column=3, padx=5, pady=5)
+        self.value_entry.grid(row=0, column=3, padx=4, pady=3)
 
         # Botão remover
         self.remove_btn = ctk.CTkButton(
             self.frame,
             text="✕",
             width=32,
-            height=32,
+            height=26,
             command=self.remove,
             fg_color="#8b0000",
             hover_color="#a52a2a"
         )
-        self.remove_btn.grid(row=0, column=4, padx=5, pady=5)
+        self.remove_btn.grid(row=0, column=4, padx=4, pady=3)
 
     def on_condition_change(self, value=None):
         """Handle condition change - hide value for conditions that don't need it"""
@@ -110,7 +110,7 @@ class FilterRow:
 
     def pack(self):
         """Pack the frame"""
-        self.frame.pack(fill="x", padx=5, pady=2)
+        self.frame.pack(fill="x", padx=4, pady=1)
 
     def remove(self):
         """Remove this filter row"""

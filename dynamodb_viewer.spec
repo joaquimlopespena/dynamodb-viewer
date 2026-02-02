@@ -9,6 +9,8 @@ datas = [('src', 'src'), ('img', 'img')]
 hiddenimports = [
     'boto3', 'botocore', 'botocore.exceptions', 'tkinter',
     'ijson', 'tqdm', 'decimal',
+    # Pillow/Tkinter integration for ImageTk
+    'PIL', 'PIL.Image', 'PIL.ImageTk', 'PIL._tkinter_finder',
     'src', 'src.config', 'src.ui', 'src.ui.windows', 'src.ui.components',
     'src.ui.components.environment_selector', 'src.ui.components.connection_dialog',
     'src.ui.components.import_dialog', 'src.services', 'src.services.dynamodb_service',

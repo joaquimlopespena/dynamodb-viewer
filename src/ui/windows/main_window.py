@@ -102,13 +102,14 @@ class MainWindow:
         main_container.pack(fill="both", expand=True, padx=5, pady=5)
 
         # Configure grid
-        main_container.grid_columnconfigure(0, weight=1, minsize=220)
-        main_container.grid_columnconfigure(1, weight=4)
+        main_container.grid_columnconfigure(0, weight=0, minsize=240)
+        main_container.grid_columnconfigure(1, weight=1)
         main_container.grid_rowconfigure(0, weight=1)
 
         # Left panel - Table list
-        left_frame = ctk.CTkFrame(main_container)
+        left_frame = ctk.CTkFrame(main_container, width=240)
         left_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 5))
+        left_frame.grid_propagate(False)
 
         # Right panel
         right_frame = ctk.CTkFrame(main_container)
@@ -137,7 +138,7 @@ class MainWindow:
             width=80,
             height=28,
             font=ctk.CTkFont(size=11)
-        ).pack(side="right")
+        ).pack(side="right", padx=(8, 0))
 
         # Refresh button
         ctk.CTkButton(
@@ -244,52 +245,57 @@ class MainWindow:
         ctk.CTkLabel(
             filters_frame,
             text="▼ Filtros - opcional",
-            font=ctk.CTkFont(size=12, weight="bold")
-        ).pack(anchor="w", padx=10, pady=(5, 2))
+            font=ctk.CTkFont(size=11, weight="bold")
+        ).pack(anchor="w", padx=8, pady=(4, 1))
 
         # Container for filter rows (compact)
-        self.filters_container = ctk.CTkFrame(filters_frame, fg_color="transparent")
-        self.filters_container.pack(fill="x", padx=10, pady=2)
+        self.filters_container = ctk.CTkFrame(
+            filters_frame,
+            fg_color="transparent",
+            height=1
+        )
+        self.filters_container.pack(fill="x", padx=8, pady=1)
+        self.filters_container.pack_propagate(True)
 
         # Filter action buttons
         filter_actions = ctk.CTkFrame(filters_frame, fg_color="transparent")
-        filter_actions.pack(fill="x", padx=10, pady=(2, 8))
+        filter_actions.pack(fill="x", padx=8, pady=(1, 6))
 
         ctk.CTkButton(
             filter_actions,
             text="➕ Adicionar filtro",
             command=self.add_filter_row,
             width=130,
-            height=30
-        ).pack(side="left", padx=5)
+            height=26
+        ).pack(side="left", padx=4)
 
         ctk.CTkButton(
             filter_actions,
             text="▶ Executar",
             command=self.execute_filters,
             width=100,
-            height=30,
+            height=26,
             fg_color="#2d5a27",
             hover_color="#3d7a37"
-        ).pack(side="left", padx=5)
+        ).pack(side="left", padx=4)
 
         ctk.CTkButton(
             filter_actions,
             text="🔄 Redefinir",
             command=self.reset_filters,
             width=100,
-            height=30,
+            height=26,
             fg_color="transparent",
             border_width=1,
             text_color=("gray10", "gray90")
-        ).pack(side="left", padx=5)
+        ).pack(side="left", padx=4)
 
         self.status_label = ctk.CTkLabel(
             filter_actions,
             text="",
-            font=ctk.CTkFont(size=11)
+            font=ctk.CTkFont(size=10)
         )
-        self.status_label.pack(side="left", padx=15)
+        self.status_label.pack(side="left", padx=10)
 
         # Data toolbar
         toolbar = ctk.CTkFrame(parent, fg_color="transparent")
@@ -432,10 +438,7 @@ class MainWindow:
         """Change server/environment - Close current window and reopen selector"""
         from src.ui.components.environment_selector import EnvironmentSelector
 
-        confirm = messagebox.askyesno(
-            "Mudar Servidor",
-            "Deseja realmente mudar de servidor?\n\nA janela será fechada e o seletor de servidor será aberto novamente."
-        )
+        confirm = self._confirm_change_server()
 
         if not confirm:
             return
@@ -461,6 +464,65 @@ class MainWindow:
         app_root = ctk.CTk()
         app = MainWindow(app_root)
         app_root.mainloop()
+
+    def _confirm_change_server(self):
+        """Show a CTk confirmation dialog to keep UI consistent."""
+        dialog = ctk.CTkToplevel(self.root)
+        dialog.title("Mudar Servidor")
+        dialog.geometry("420x180")
+        dialog.resizable(False, False)
+        dialog.transient(self.root)
+        dialog.configure(fg_color="#2b2b2b")
+
+        container = ctk.CTkFrame(dialog, fg_color="#2b2b2b")
+        container.pack(fill="both", expand=True, padx=16, pady=16)
+
+        ctk.CTkLabel(
+            container,
+            text="Deseja realmente mudar de servidor?\n\n"
+                 "A janela será fechada e o seletor de servidor será aberto novamente.",
+            justify="left",
+            anchor="w",
+            wraplength=380,
+            text_color="#f0f0f0",
+            font=ctk.CTkFont(size=12)
+        ).pack(fill="x", padx=4, pady=(0, 12))
+
+        btn_row = ctk.CTkFrame(container, fg_color="transparent")
+        btn_row.pack(fill="x")
+
+        result = {"value": False}
+
+        def on_yes():
+            result["value"] = True
+            dialog.destroy()
+
+        def on_no():
+            dialog.destroy()
+
+        ctk.CTkButton(
+            btn_row,
+            text="Sim",
+            width=110,
+            command=on_yes
+        ).pack(side="right", padx=6)
+
+        ctk.CTkButton(
+            btn_row,
+            text="Não",
+            width=110,
+            fg_color="transparent",
+            border_width=1,
+            text_color=("gray10", "gray90"),
+            command=on_no
+        ).pack(side="right", padx=6)
+
+        dialog.update_idletasks()
+        dialog.lift()
+        dialog.focus_force()
+        dialog.after(0, dialog.grab_set)
+        dialog.wait_window()
+        return result["value"]
 
     def load_tables(self):
         """Load list of tables"""
