@@ -17,6 +17,30 @@ def get_logo_path():
     return os.path.join(get_base_path(), "img", "logo.png")
 
 
+def load_icon_for_ctk(root):
+    """
+    Carrega logo.png como ícone da janela CTk.
+    Mantém referência no root para não ser coletado pelo GC.
+    Retorna True se o ícone foi definido, False caso contrário.
+    """
+    path = get_logo_path()
+    if not os.path.isfile(path):
+        return False
+    try:
+        from PIL import Image, ImageTk
+        img = Image.open(path).convert("RGBA")
+        resample = getattr(Image, "Resampling", Image).LANCZOS if hasattr(Image, "Resampling") else Image.LANCZOS
+        img.thumbnail((32, 32), resample)
+        photo = ImageTk.PhotoImage(img)
+        root.iconphoto(True, photo)
+        if not hasattr(root, "_icon_photo"):
+            root._icon_photo = photo
+        return True
+    except Exception:
+        pass
+    return False
+
+
 def load_icon_for_tk(root):
     """
     Carrega logo.png como ícone da janela Tk.
@@ -26,11 +50,9 @@ def load_icon_for_tk(root):
     path = get_logo_path()
     if not os.path.isfile(path):
         return False
-    # Tentar Pillow primeiro (PNG costuma funcionar melhor)
     try:
         from PIL import Image, ImageTk
         img = Image.open(path).convert("RGBA")
-        # Ícone pequeno para a barra de título (32x32 ou menor)
         resample = getattr(Image, "Resampling", Image).LANCZOS if hasattr(Image, "Resampling") else Image.LANCZOS
         img.thumbnail((32, 32), resample)
         photo = ImageTk.PhotoImage(img)
